@@ -37,27 +37,6 @@ fn loose_iter() {
     )
 }
 
-#[test]
-fn loose_find() {
-    let mut o = ldb()
-        .find(&bin("722fe60ad4f0276d5a8121970b5bb9dccdad4ef9"))
-        .unwrap();
-    assert_eq!(o.kind, Kind::Tag);
-    assert_eq!(o.size, 1024);
-    assert_eq!(o.parsed().unwrap(), parsed::Object::Tag(tag_fixture(7200)))
-}
-
-#[test]
-fn loose_tag_parse() {
-    let fixture = fixture_bytes("objects/tag.txt");
-    let actual = parsed::Tag::from_bytes(&fixture).unwrap();
-    assert_eq!(actual, tag_fixture(9000));
-    assert_eq!(
-        actual.target(),
-        bin("ffa700b4aca13b80cb6b98a078e7c96804f8e0ec")
-    );
-}
-
 fn tag_fixture(offset: i32) -> parsed::Tag<'static> {
     parsed::Tag {
         target_raw: b"ffa700b4aca13b80cb6b98a078e7c96804f8e0ec",
@@ -94,4 +73,14 @@ cjHJZXWmV4CcRfmLsXzU8s2cR9A0DBvOxhPD1TlKC2JhBFXigjuL9U4Rbq9tdegB
             },
         },
     }
+}
+
+#[test]
+fn loose_find() {
+    let mut o = ldb()
+        .find(&bin("722fe60ad4f0276d5a8121970b5bb9dccdad4ef9"))
+        .unwrap();
+    assert_eq!(o.kind, Kind::Tag);
+    assert_eq!(o.size, 1024);
+    assert_eq!(o.parsed().unwrap(), parsed::Object::Tag(tag_fixture(7200)))
 }
