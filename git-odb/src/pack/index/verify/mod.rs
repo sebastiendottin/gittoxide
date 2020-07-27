@@ -140,7 +140,7 @@ impl index::File {
         owned::Id::from_20_bytes(&self.data[from..from + SHA1_SIZE])
     }
 
-    pub fn verify_checksum_of_index_with_progress(&self, mut progress: impl Progress) -> Result<owned::Id, Error> {
+    pub fn verify_checksum(&self, mut progress: impl Progress) -> Result<owned::Id, Error> {
         let throughput = TimeThroughput::new(self.data.len());
         let mut hasher = git_features::hash::Sha1::default();
         hasher.update(&self.data[..self.data.len() - SHA1_SIZE]);
@@ -172,9 +172,10 @@ impl index::File {
         C: pack::cache::DecodeEntry,
     {
         let mut root = progress::DoOrDiscard::from(progress);
-        let progress = root.add_child("Sha1 of index");
 
-        let verify_self = move || self.verify_checksum_of_index_with_progress(progress);
+        let progress = root.add_child("Sha1 of index");
+        let verify_self = move || self.verify_checksum(progress);
+
         match pack {
             None => verify_self().map(|id| (id, None)),
             Some((pack, mode, algorithm)) => {
