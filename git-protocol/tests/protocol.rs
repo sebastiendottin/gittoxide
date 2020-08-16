@@ -1,5 +1,4 @@
-pub type Error = Box<dyn std::error::Error>;
-pub type Result = std::result::Result<(), Error>;
+pub type Result = std::result::Result<(), Box<dyn std::error::Error>>;
 
 mod packet_line;
 mod progress;
