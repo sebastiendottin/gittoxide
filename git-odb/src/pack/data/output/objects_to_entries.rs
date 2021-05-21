@@ -3,6 +3,7 @@ use git_features::{hash, parallel, progress::Progress};
 use git_hash::{oid, ObjectId};
 
 /// Write all `objects` into `out` without attempting to apply any delta compression.
+/// TODO: Update this
 /// This allows objects to be written rather immediately.
 /// Objects are held in memory and compressed using DEFLATE, with those in-flight chunks of compressed
 /// objects being sent to the current thread for writing. No buffering of these objects is performed,
@@ -31,8 +32,8 @@ use git_hash::{oid, ObjectId};
 ///   so with minimal overhead (especially compared to `gixp index-from-pack`)~~ Probably works now by chaining Iterators
 ///  or keeping enough state to write a pack and then generate an index with recorded data.
 ///
-pub fn objects_to_entries_iter<Locate, Iter, Oid, Cache>(
-    db: Locate,
+pub fn objects_to_entries_iter<Find, Iter, Oid, Cache>(
+    db: Find,
     make_cache: impl Fn() -> Cache + Send + Clone + Sync + 'static,
     objects: Iter,
     _progress: impl Progress,
@@ -42,13 +43,11 @@ pub fn objects_to_entries_iter<Locate, Iter, Oid, Cache>(
         input_object_expansion,
         chunk_size,
     }: Options,
-) -> impl Iterator<Item = Result<Vec<output::Entry>, Error<Locate::Error>>>
-       + parallel::reduce::Finalize<
-    Reduce = parallel::reduce::IdentityWithResult<Vec<output::Entry>, Error<Locate::Error>>,
->
+) -> impl Iterator<Item = Result<Vec<output::Entry>, Error<Find::Error>>>
+       + parallel::reduce::Finalize<Reduce = parallel::reduce::IdentityWithResult<Vec<output::Entry>, Error<Find::Error>>>
 where
-    Locate: crate::Find + Clone + Send + Sync + 'static,
-    <Locate as crate::Find>::Error: Send,
+    Find: crate::Find + Clone + Send + Sync + 'static,
+    <Find as crate::Find>::Error: Send,
     Iter: Iterator<Item = Oid> + Send + 'static,
     Oid: AsRef<oid> + Send + 'static,
     Cache: pack::cache::DecodeEntry,
