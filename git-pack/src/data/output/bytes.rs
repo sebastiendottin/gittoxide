@@ -123,9 +123,9 @@ where
             }
             None => {
                 let digest = self.output.hash.clone().digest();
-                self.output.write_all(&digest[..])?;
+                self.output.inner.write_all(&digest[..])?;
                 self.written += digest.len() as u64;
-                self.output.flush()?;
+                self.output.inner.flush()?;
                 self.is_done = true;
                 self.trailer = Some(git_hash::ObjectId::from(digest));
             }
