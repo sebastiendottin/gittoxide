@@ -29,4 +29,18 @@ world
  - 20 commits where understood as [conventional](https://www.conventionalcommits.org).
  - 3 unique issues were worked on
 
+<details><summary>Commit Details</summary>
+
+<csr-read-only-do-not-edit/>
+ * **#42**
+    - Just the title
+    - another title
+ * **Uncategorized**
+    - Just the title
+    - title and body
+body with
+multiple newlines
+which probably should be put into a single line but we don't go there for now.
+</details>
+
 
