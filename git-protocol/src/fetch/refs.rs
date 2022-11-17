@@ -26,8 +26,9 @@ pub(crate) mod function {
     use std::borrow::Cow;
 
     use super::Error;
-    use crate::fetch::{indicate_end_of_interaction, Command, LsRefsAction};
+    use crate::fetch::{Command, LsRefsAction};
     use crate::handshake::{refs::from_v2_refs, Ref};
+    use crate::indicate_end_of_interaction;
 
     /// Invoke an ls-refs command on `transport`  (assuming `protocol_version` 2 or panic), which requires a prior handshake that yielded
     /// server `capabilities`. `prepare_ls_refs(capabilities, arguments, features)` can be used to alter the _ls-refs_. `progress` is used to provide feedback.
