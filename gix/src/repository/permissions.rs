@@ -1,15 +1,6 @@
+//! Various permissions to define what can be done when operating a [`Repository`][crate::Repository].
+use crate::open::Permissions;
 use gix_sec::Trust;
-
-/// Permissions associated with various resources of a git repository
-#[derive(Debug, Clone)]
-pub struct Permissions {
-    /// Control which environment variables may be accessed.
-    pub env: Environment,
-    /// Permissions related where git configuration should be loaded from.
-    pub config: Config,
-    /// Permissions related to where `gitattributes` should be loaded from.
-    pub attributes: Attributes,
-}
 
 /// Configure from which sources git configuration may be loaded.
 ///
