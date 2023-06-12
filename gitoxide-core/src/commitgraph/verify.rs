@@ -9,26 +9,35 @@ pub struct Context<W1: std::io::Write, W2: std::io::Write> {
     pub output_statistics: Option<OutputFormat>,
 }
 
-pub(crate) mod function {
-    use std::io;
+impl Default for Context<Vec<u8>, Vec<u8>> {
+    fn default() -> Self {
+        Context {
+            err: Vec::new(),
+            out: Vec::new(),
+            output_statistics: None,
+        }
+    }
+}
 
-    use crate::commitgraph::verify::Context;
+pub(crate) mod function {
     use crate::OutputFormat;
     use anyhow::{Context as AnyhowContext, Result};
+    use gix::commitgraph::{verify::Outcome, Graph};
+    use std::{io, path::Path};
 
     pub fn verify<W1, W2>(
-        repo: gix::Repository,
-        Context {
+        path: impl AsRef<Path>,
+        super::Context {
             err: _err,
             mut out,
             output_statistics,
-        }: Context<W1, W2>,
+        }: super::Context<W1, W2>,
     ) -> Result<gix::commitgraph::verify::Outcome>
     where
         W1: io::Write,
         W2: io::Write,
     {
-        let g = repo.commit_graph()?;
+        let g = Graph::at(path).with_context(|| "Could not open commit graph")?;
 
         #[allow(clippy::unnecessary_wraps, unknown_lints)]
         fn noop_processor(_commit: &gix::commitgraph::file::Commit<'_>) -> std::result::Result<(), std::fmt::Error> {
@@ -49,7 +58,7 @@ pub(crate) mod function {
         Ok(stats)
     }
 
-    fn print_human_output(out: &mut impl io::Write, stats: &gix::commitgraph::verify::Outcome) -> io::Result<()> {
+    fn print_human_output(out: &mut impl io::Write, stats: &Outcome) -> io::Result<()> {
         writeln!(out, "number of commits with the given number of parents")?;
         let mut parent_counts: Vec<_> = stats.parent_counts.iter().map(|(a, b)| (*a, *b)).collect();
         parent_counts.sort_by_key(|e| e.0);
